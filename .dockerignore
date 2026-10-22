@@ -1,0 +1,8 @@
+# 不进镜像的内容：虚拟环境、缓存、本地数据库、密钥、版本库
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+stores.db
+.env
+.git/

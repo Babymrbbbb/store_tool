@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# 本地数据库 / 密钥（含敏感信息，绝不入库）
+stores.db
+*.db
+.env
+
+# IDE / 操作系统
+.idea/
+.vscode/
+.DS_Store
