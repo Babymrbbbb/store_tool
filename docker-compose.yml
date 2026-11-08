@@ -1,0 +1,11 @@
+# 一键起停：docker compose up --build
+services:
+  store_tool:
+    build: .                      # 用同目录 Dockerfile 构建
+    ports:
+      - "8000:8000"               # 宿主 8000 映射到容器 8000
+    environment:
+      - STORE_API_KEY=dev-secret-key   # 生产请改强密钥或用 .env
+    # 持久化说明：SQLite 文件默认在容器内 /app/stores.db。
+    # 若要容器重建后数据不丢，可加： volumes: ["./data:/app/data"]
+    # 并把 STORE_STORE_DB_FILE=/app/data/stores.db 一并传入。
