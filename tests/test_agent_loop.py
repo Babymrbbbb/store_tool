@@ -82,3 +82,16 @@ def test_store_execute_uses_state_machine():
     with Session(loop._engine) as s:
         d = s.get(Dispatch, ids[0])
         assert d.status == "executed"
+
+
+def test_campaign_idempotent_on_rerun():
+    _memory_db()
+    # 第一次跑：试点门店全量下发并验收
+    res1 = run_campaign("门店标准落地", store_codes=["A01", "D01"])
+    assert res1["accepted"] == 6
+    # 第二次重跑：已 accepted 的记录应被跳过，不再重复处理（幂等，不崩溃）
+    res2 = run_campaign("门店标准落地", store_codes=["A01", "D01"])
+    assert res2["accepted"] == 0
+    assert res2["needs_rework"] == 0
+    # 总 accepted 仍为 6（没有新增）
+    assert res2["stats"]["by_status"]["accepted"] == 6

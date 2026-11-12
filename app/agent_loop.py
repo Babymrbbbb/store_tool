@@ -142,8 +142,20 @@ def run_campaign(
     messages.append(plan)
     ids = hq.dispatch(plan)
 
+    # 仅处理尚未推进的下发记录，保证「重跑战役」幂等：已 executed / accepted 的跳过，
+    # 否则 StoreAgent.execute 会对 accepted 记录执行 executed→executed 的非法跳步而崩溃。
+    with Session(loop._engine) as s:
+        dispatched_ids = [
+            d.id
+            for d in s.exec(
+                select(Dispatch).where(
+                    Dispatch.id.in_(ids), Dispatch.status == "dispatched"
+                )
+            )
+        ]
+
     accepted, needs_rework = 0, 0
-    for did in ids:
+    for did in dispatched_ids:
         report = store.execute(did)
         messages.append(
             AgentMessage(store.name, review.name, "execute", report.__dict__)
