@@ -42,3 +42,24 @@ pytest tests/test_store_loop.py -q
 ```
 
 把"下发覆盖率"和"状态不可跳步"做成可测试的断言，闭环才不会在无人察觉时悄悄破洞。
+
+## 多 Agent 协作升级（2026-11-12）
+
+在单状态机之上，借鉴 Orkas / ECC 的「多 Agent 协作」范式，把隐式的
+"总部下发 → 门店执行 → 门店验收"拆成三个显式 Agent 角色，每一步都有结构化
+握手（`AgentMessage`）与回传（`ExecutionReport`），便于审计与回放。
+
+| 角色 | 职责 | 复用机制 |
+|---|---|---|
+| `HQAgent` | 拆解目标 → 选定作战卡 + 门店 → 下发（置 `dispatched`） | 写入 `Dispatch` 记录 |
+| `StoreAgent` | 执行作战卡 → 回传执行报告 | 复用 `advance(executed)`，非法跳步由状态机拦截 |
+| `ReviewAgent` | 校验执行报告 → 通过则 `accepted`，否则驳回（保持 `executed`） | 复用 `advance(accepted)`；驳回抛 `ReviewRejected` |
+
+`run_campaign(objective)` 端到端跑一场战役：`HQ` 下发 → 各 `Store` 执行 →
+`Review` 验收，返回消息日志与 `accepted / needs_rework` 计数。验收守卫保证
+"执行未成功 / 报告说明过短"的条目**不会**被推进到 `accepted`，对应真实系统里
+"门店验收"这一质量闸。
+
+- 代码：`app/agent_loop.py`；
+- 测试：`tests/test_agent_loop.py`（三角色握手、验收驳回守卫、端到端战役）。
+

@@ -26,6 +26,13 @@
 - **API Key 路由级鉴权**（公开路由免鉴权，便于健康探测）
 - **Docker 化**：一键构建部署
 
+### 门店执行闭环（合成，多 Agent 协作）
+
+`app/store_loop.py` + `app/agent_loop.py` 演示「作战卡下发 → 门店执行 → 门店验收」
+的门店执行闭环：单状态机（`dispatched → executed → accepted`）+ 三角色 Agent 协作
+（HQ / Store / Review），验收守卫保证质量闸不被绕过。详见
+[docs/store-execution-loop.md](docs/store-execution-loop.md)。
+
 ## 项目结构
 
 ```
