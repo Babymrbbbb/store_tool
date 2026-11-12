@@ -84,10 +84,13 @@ venv/Scripts/python -m pytest test_main.py -v
 
 ## 接口鉴权
 
-业务接口需在请求头携带 API Key（默认 `dev-secret-key`，生产用环境变量 `STORE_API_KEY` 覆盖）；`/health` 与 `/` 为公开路由，无需携带：
+业务接口需在请求头携带 API Key；`/health` 与 `/` 为公开路由，无需携带。
+**密钥不写死在代码里**：未设置 `STORE_API_KEY` 时，服务每次启动生成随机强密钥
+（重启即变），稳定使用必须显式配置：
 
 ```bash
-curl -H "X-API-Key: dev-secret-key" http://127.0.0.1:8000/stores
+export STORE_API_KEY="$(openssl rand -hex 24)"   # 或用 python: secrets.token_urlsafe(32)
+curl -H "X-API-Key: $STORE_API_KEY" http://127.0.0.1:8000/stores
 curl http://127.0.0.1:8000/health
 ```
 
@@ -115,7 +118,8 @@ curl http://127.0.0.1:8000/health
 
 ```bash
 docker compose up --build
-# 调用：curl -H "X-API-Key: dev-secret-key" http://localhost:8000/stores
+# 先在 .env 设置 STORE_API_KEY，再调用：
+curl -H "X-API-Key: $STORE_API_KEY" http://localhost:8000/stores
 ```
 
 容器启动顺序：Alembic 迁移建表 → 灌示例数据 → 起 uvicorn。

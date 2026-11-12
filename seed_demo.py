@@ -9,7 +9,7 @@
 #
 # 部署公网时配套：
 #   1) 设环境变量 STORE_STORE_DB_FILE=demo.db  ← 让服务读演示库，而不是真实库
-#   2) 设环境变量 STORE_API_KEY=<一段强随机串>  ← 覆盖默认弱密钥 dev-secret-key
+#   2) 设环境变量 STORE_API_KEY=<一段强随机串>  ← 固定密钥，避免重启后随机值变化
 # 详见《阶段B_安全部署检查清单.md》
 
 import os

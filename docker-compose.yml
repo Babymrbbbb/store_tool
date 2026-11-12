@@ -5,7 +5,9 @@ services:
     ports:
       - "8000:8000"               # 宿主 8000 映射到容器 8000
     environment:
-      - STORE_API_KEY=dev-secret-key   # 生产请改强密钥或用 .env
+      # 不设弱默认值：留空则服务启动时生成随机强密钥（重启即变）。
+      # 稳定演示请在 .env 里显式设置 STORE_API_KEY（例如 openssl rand -hex 24）。
+      - STORE_API_KEY=${STORE_API_KEY:-}
     # 持久化说明：SQLite 文件默认在容器内 /app/stores.db。
     # 若要容器重建后数据不丢，可加： volumes: ["./data:/app/data"]
     # 并把 STORE_STORE_DB_FILE=/app/data/stores.db 一并传入。
