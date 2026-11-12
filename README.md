@@ -38,7 +38,10 @@ store_tool/
 │   └── config.py        # 配置层（数据库文件 / 密钥）
 ├── migrations/          # Alembic 迁移脚本
 ├── seed.py              # 灌入示例门店数据（幂等）
-├── test_main.py         # pytest 单测
+├── test_main.py         # pytest 单测（接口 / 鉴权 / 错误信封）
+├── seed_loop.py         # 灌入合成门店执行闭环数据（演示）
+├── tests/
+│   └── test_store_loop.py  # 闭环状态机与全量下发计数
 ├── requirements.txt     # 运行时依赖
 ├── requirements-dev.txt # 开发/测试依赖
 ├── Dockerfile
@@ -118,6 +121,16 @@ hunkon_rag 在 store_tool 之上叠加 AI 应用架构，构成「从 CRUD 到 A
 
 - 仓库：https://github.com/Babymrbbbb/hunkon_rag
 - 看点：供应商解耦（LLM/Embedder 抽象）、向量余弦召回、评测闭环、真实 LLM 验证记录
+
+## 门店执行闭环（合成参考实现）
+
+`app/store_loop.py` 在 store_tool 之上演示「作战卡下发 → 门店执行 → 门店验收」的
+门店执行闭环（方法论开源复刻，用合成门店：演示品牌 A/B/C/D 四市共 12 家，**不含真实数据**）。
+
+- 三张表：`LoopStore` / `BattleCard` / `Dispatch`；状态机 `dispatched → executed → accepted`，跳步会被拦截；
+- 全量下发：12 家 × 3 张卡 = 36 条下发记录，试点门店（`A01`/`D01`）跑通全闭环，其余仅下发；
+- 一键建库：`python seed_loop.py`；测试：`pytest tests/test_store_loop.py -q`；
+- 设计思路与可测试断言，见 [docs/store-execution-loop.md](docs/store-execution-loop.md)。
 
 ## 学习收获
 

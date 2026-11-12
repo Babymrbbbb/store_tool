@@ -125,7 +125,7 @@ LANDING_HTML = '''<!DOCTYPE html>
 # 默认会把 /health 307 跳到 /health/，裸 curl / 探针拿不到 200）。
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": "swan-store-tool", "version": "0.2.0"}
+    return {"status": "ok", "service": "store-demo-tool", "version": "0.2.0"}
 
 @app.get("/")
 def root():
